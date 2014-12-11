@@ -7,7 +7,10 @@ $app->get('/stats/list', function () use ($app) {
         ),
     );
 
-    return $app->json($response);
+    return $app->json($response, 200, array(
+        'Cache-Control' => 'public, max-age=3600',
+        'Access-Control-Allow-Origin:' => '*',
+    ));
 });
 
 $app->get('/stats/show/signatures', function () use ($app) {
@@ -38,5 +41,6 @@ $app->get('/stats/show/signatures', function () use ($app) {
 
     return $app->json($response, 200, array(
         'Cache-Control' => 'public, max-age=300',
+        'Access-Control-Allow-Origin:' => '*',
     ));
 });
