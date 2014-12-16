@@ -4,6 +4,9 @@ $app->get('/stats/list', function () use ($app) {
     $response = array(
         'stats' => array(
             array('name' => 'signatures'),
+            array('name' => 'wp-signatures'),
+            array('name' => 'pligg-signatures'),
+            array('name' => 'double-signatures'),
         ),
     );
 
@@ -13,34 +16,34 @@ $app->get('/stats/list', function () use ($app) {
     ));
 });
 
-$app->get('/stats/show/signatures', function () use ($app) {
-    $pliggTable = $app['pligg.table_prefix'].'users';
-    $wpTable = $app['wordpress.table_prefix'].'dk_speakup_signatures';
-    $wpPetitionID = $app['wordpress.petition_id'];
+$app->get('/stats/show/{resource}', function (Silex\Application $app, $resource) {
+    switch ($resource) {
+        case 'wp-signatures':
+            $method = 'getWordpressSignatures';
+            break;
+        case 'pligg-signatures':
+            $method = 'getPliggSignatures';
+            break;
+        case 'double-signatures':
+            $method = 'getDoubleSignatures';
+            break;
+        case 'signatures':
+            $method = 'getSignatures';
+            break;
+        default:
+            $app->abort(404);
+            break;
+    }
 
-    // Combien d'utilisateurs sur pligg
-    $sql = 'SELECT COUNT(user_id) FROM '.$pliggTable;
-    $pliggUsers = $app['db']->fetchColumn($sql);
-
-    // Combien de signataires sur Wordpress
-    $sql = 'SELECT COUNT(id) FROM '.$wpTable.' '.
-        'WHERE petitions_id = ?';
-    $wpSignatures = $app['db']->fetchColumn($sql, array($wpPetitionID));
-
-    // Combien sont dans les deux
-    $sql = 'SELECT COUNT(user_id) FROM '.$pliggTable.' '.
-        'INNER JOIN '.$wpTable.' '.
-        'ON '.$pliggTable.'.user_email='.$wpTable.'.email '.
-        'WHERE '.$wpTable.'.petitions_id = ?';
-    $duplicates = $app['db']->fetchColumn($sql, array($wpPetitionID));
+    $signatures = $app['app.statistics']->$method();
 
     $response = array(
         'name' => 'signatures',
-        'value' => $pliggUsers + $wpSignatures - $duplicates,
+        'value' => $signatures,
     );
 
     return $app->json($response, 200, array(
-        'Cache-Control' => 'public, max-age=300',
-        'Access-Control-Allow-Origin:' => '*',
+        'Cache-Control' => 'public, max-age=300, ',
+        'Access-Control-Allow-Origin' => '*',
     ));
 });

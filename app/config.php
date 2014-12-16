@@ -24,6 +24,16 @@ $app['db.options'] = array(
 
 // Application configuration
 
-$app['pligg.table_prefix'] = $app['parameters.pligg_table_prefix'];
-$app['wordpress.table_prefix'] = $app['parameters.wordpress_table_prefix'];
-$app['wordpress.petition_id'] = $app['parameters.wordpress_petition_id'];
+$app['app.pligg_table_prefix'] = $app['parameters.pligg_table_prefix'];
+$app['app.wordpress_table_prefix'] = $app['parameters.wordpress_table_prefix'];
+$app['app.wordpress_petition_id'] = $app['parameters.wordpress_petition_id'];
+
+// Services configuration
+$app['app.statistics'] = function ($app) {
+    $db = $app['db'];
+    $pliggTable = $app['app.pligg_table_prefix'].'users';
+    $wpTable = $app['app.wordpress_table_prefix'].'dk_speakup_signatures';
+    $wpPetitionID = $app['app.wordpress_petition_id'];
+
+    return new App\Services\Statistics($db, $pliggTable, $wpTable, $wpPetitionID);
+};
