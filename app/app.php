@@ -38,7 +38,7 @@ $app->get('/stats/show/{resource}', function (Silex\Application $app, $resource)
     $signatures = $app['app.statistics']->$method();
 
     $response = array(
-        'name' => 'signatures',
+        'name' => $resource,
         'value' => $signatures,
     );
 
