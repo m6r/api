@@ -1,4 +1,4 @@
-app/cache/*
+var/cache/*
 app/parameters.php
 composer.phar
 vendor/
