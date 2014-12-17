@@ -1,5 +1,8 @@
 <?php
 
+use App\Services\Statistics;
+use Symfony\Component\HttpFoundation\Request;
+
 $app->get('/stats/list', function () use ($app) {
     $response = array(
         'stats' => array(
@@ -16,31 +19,35 @@ $app->get('/stats/list', function () use ($app) {
     ));
 });
 
-$app->get('/stats/show/{resource}', function (Silex\Application $app, $resource) {
+$app->get('/stats/show/{resource}', function (Silex\Application $app, Request $req, $resource) {
     switch ($resource) {
         case 'wp-signatures':
-            $method = 'getWordpressSignatures';
+            $scope = Statistics::SIGNATURES_WORDPRESS;
             break;
         case 'pligg-signatures':
-            $method = 'getPliggSignatures';
+            $scope = Statistics::SIGNATURES_PLIGG;
             break;
         case 'double-signatures':
-            $method = 'getDoubleSignatures';
+            $scope = Statistics::SIGNATURES_DUPLICATES;
             break;
         case 'signatures':
-            $method = 'getSignatures';
+            $scope = Statistics::SIGNATURES_TOTAL;
             break;
         default:
             $app->abort(404);
             break;
     }
 
-    $signatures = $app['app.statistics']->$method();
+    $signatures = $app['app.statistics']->getSignatures($scope);
 
     $response = array(
         'name' => $resource,
         'value' => $signatures,
     );
+
+    if ('day' === $req->query->get('history')) {
+        $response['history'] = $app['app.statistics']->getSignaturesHistory($scope);
+    }
 
     return $app->json($response, 200, array(
         'Cache-Control' => 'public, max-age=300, ',
