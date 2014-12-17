@@ -131,12 +131,12 @@ class Statistics
                 'CASE '.
                     'WHEN DATE(date) >= DATE(user_date) THEN DATE(date) '.
                     'WHEN DATE(date) < DATE(user_date) THEN DATE(user_date) '.
-                'END AS date, COUNT(user_id) as new_signatures '.
+                'END AS most_recent_date, COUNT(user_id) as new_signatures '.
             'FROM '.$pliggTable.' '.
             'INNER JOIN '.$wpTable.' '.
             'ON '.$pliggTable.'.user_email='.$wpTable.'.email '.
             'WHERE '.$wpTable.'.petitions_id = ? '.
-            'GROUP BY date';
+            'GROUP BY most_recent_date';
         $duplicates = $this->db->fetchAll($sql, array($wpPetitionID));
 
         return $duplicates;
