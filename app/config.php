@@ -6,7 +6,7 @@ require_once __DIR__.'/parameters.php';
 
 // HTTP reverse proxy configuration
 $app->register(new Silex\Provider\HttpCacheServiceProvider(), array(
-   'http_cache.cache_dir' => __DIR__.'../var/cache/',
+   'http_cache.cache_dir' => __DIR__.'/../var/cache/',
    'http_cache.esi'       => null,
 ));
 
