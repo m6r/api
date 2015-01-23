@@ -180,17 +180,9 @@ class Statistics
         $wpTable = $this->wpTable;
         $wpPetitionID = $this->wpPetitionID;
 
-        $sql =
-            'SELECT COUNT(DISTINCT email) FROM ('.
-                'SELECT user_email AS email '.
-                'FROM '.$pliggTable.' '.
-                'UNION '.
-                'SELECT email '.
-                'FROM '.$wpTable.' '.
-                'WHERE '.$wpTable.'.petitions_id = ? '.
-            ') AS signatures';
-
-        $total = $this->db->fetchColumn($sql, array($wpPetitionID));
+        $total = $this->getWordpressSignatures()
+            + $this->getPliggSignatures()
+            - $this->getDuplicatesSignatures();
 
         return $total;
     }
